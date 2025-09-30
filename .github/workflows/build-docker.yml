@@ -24,7 +24,7 @@ jobs:
           password: ${{secrets.DOCKER_TOKEN}}
 
       - name: Construir Imagen
-        run: docker build -t ${{secrets.DOCKER_USER}}/univ-prueba:latest .
+        run: docker build -t ${{secrets.DOCKER_USER}}/prs3-front:latest .
 
       - name: Publicar Imagen
-        run: docker push ${{secrets.DOCKER_USER}}/univ-prueba:latest
+        run: docker push ${{secrets.DOCKER_USER}}/prs3-front:latest
