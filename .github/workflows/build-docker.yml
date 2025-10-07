@@ -47,15 +47,15 @@ jobs:
           username: ${{secrets.SSH_USER}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           source: "setup_vm.sh"
-          target: "/tmp"
+          target: "/tmp/"
 
       - name: Ejecutar script de instalacion de docker en la VM
         uses: appleboy/ssh-action@master
-        with:
+        with: 
           host: ${{secrets.SSH_HOST}}
           username: ${{secrets.SSH_USER}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
-          script:
+          script: |
             chmod +x /tmp/setup_vm.sh
             /tmp/setup_vm.sh ${{secrets.SSH_USER}}
             rm /tmp/setup_vm.sh
