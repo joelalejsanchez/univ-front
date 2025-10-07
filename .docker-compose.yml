@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  web:
+    image: joelsanchz/prs3-front:latest
+    container_name: mi-pagina-web
+    ports:
+      - "80:80"
+    restart: always
