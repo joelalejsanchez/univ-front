@@ -41,7 +41,7 @@ jobs:
           ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
 
       - name: Copiar script de configuracion a la setup_vm
-        uses: appleboy/scp-action@v0.1.3
+        uses: appleboy/scp-action@v0.1.7
         with: 
           host: ${{secrets.SSH_HOST}}
           username: ${{secrets.SSH_USER}}
