@@ -82,6 +82,7 @@ jobs:
             # Descargar imagen desde dockerhub
             echo ${{secrets.DOCKER_TOKEN}} | sudo docker login -u ${{secrets.DOCKER_USER}} --password-stdin
 
+            sudo docker-compose down
             sudo docker-compose pull
             sudo docker-compose up -d --force-recreate
             sudo docker logout
