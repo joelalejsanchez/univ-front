@@ -28,4 +28,4 @@ DEPLOY_PATH="/home/$USER_TO_ADD/deploy"
 # Crea la carpeta y cualquier carpeta padre si es necesario (-p)
 mkdir -p $DEPLOY_PATH
 
-echo "--- Configuración inicial de la VM completada ---"
+echo "--- Configuración inicial de la VM completada ---"
