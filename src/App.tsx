@@ -3,6 +3,7 @@ import BookGrid from "./pages/BookGrid";
 import BookDetails from "./pages/BookDetails";
 import BookCreate from "./pages/BookCreate";
 import BookUpdate from "./pages/BookUpdate";
+import "./index.css";
 
 function App() {
   return (
