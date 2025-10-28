@@ -25,7 +25,7 @@ jobs:
           user_ocid = "${{ secrets.TF_USER_OCID }}"
           fingerprint = "${{ secrets.TF_FINGERPRINT }}"
           private_key = <<EOT
-          "${{ secrets.TF_PRIVATE_KEY }}"
+          ${{ secrets.TF_PRIVATE_KEY }}
           EOT
           region = "${{ secrets.TF_REGION }}"
           compartment_ocid = "${{ secrets.TF_COMPARTMENT_OCID }}"
