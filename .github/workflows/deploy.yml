@@ -46,7 +46,9 @@ jobs:
 
       - name: Obtener IP pública de la VM
         id: vm_ip
-        run: echo "public_ip=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+        run: |
+          IP=$(terraform output -raw public_ip | tr -d '\r')
+          echo "public_ip=$IP" >> $GITHUB_ENV
 
       - name: Configurar SSH
         uses: webfactory/ssh-agent@v0.9.0
