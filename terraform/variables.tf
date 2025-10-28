@@ -1,0 +1,10 @@
+variable "tenancy_ocid" {}
+variable "user_ocid" {}
+variable "fingerprint" {}
+variable "private_key" {}
+variable "region" {}
+variable "compartment_ocid" {}
+variable "subnet_id" {}
+variable "availability_domain" {}
+variable "ubuntu_image" {}
+variable "ssh_public_key" {}
