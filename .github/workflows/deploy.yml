@@ -17,20 +17,24 @@ jobs:
         with:
           terraform_version: 1.7.0
 
-      - name: Export Terraform variables from secrets
+      - name: Crear terraform.tfvars
+        working-directory: terraform
         run: |
-          export TF_VAR_tenancy_ocid=${{secrets.TF_TENANCY_OCID}}
-          export TF_VAR_user_ocid=${{secrets.TF_USER_OCID}}
-          export TF_VAR_fingerprint=${{secrets.TF_FINGERPRINT}}
-          export TF_VAR_private_key="${{secrets.TF_PRIVATE_KEY}}"
-          export TF_VAR_region=${{secrets.TF_REGION}}
-          export TF_VAR_compartment_ocid=${{secrets.TF_COMPARTMENT_OCID}}
-          export TF_VAR_subnet_id=${{secrets.TF_SUBNET_ID}}
-          export TF_VAR_availability_domain=${{secrets.TF_AVAILABILITY_DOMAIN}}
-          export TF_VAR_ubuntu_image=${{secrets.TF_UBUNTU_IMAGE}}
-          export TF_VAR_ssh_public_key="${{secrets.TF_SSH_PUBLIC_KEY}}"
+          cat <<EOF > terraform.tfvars
+          tenancy_ocid = "${{ secrets.TF_TENANCY_OCID }}"
+          user_ocid = "${{ secrets.TF_USER_OCID }}"
+          fingerprint = "${{ secrets.TF_FINGERPRINT }}"
+          private_key = "${{ secrets.TF_PRIVATE_KEY }}"
+          region = "${{ secrets.TF_REGION }}"
+          compartment_ocid = "${{ secrets.TF_COMPARTMENT_OCID }}"
+          subnet_id = "${{ secrets.TF_SUBNET_ID }}"
+          availability_domain = "${{ secrets.TF_AVAILABILITY_DOMAIN }}"
+          ubuntu_image = "${{ secrets.TF_UBUNTU_IMAGE }}"
+          ssh_public_key = "${{ secrets.TF_SSH_PUBLIC_KEY }}"
+          EOF
 
       - name: Terraform Init & Apply
+        working-directory: terraform
         run: |
           terraform init
           terraform apply -auto-approve
@@ -86,3 +90,16 @@ jobs:
             docker-compose pull
             docker-compose up -d --force-recreate
             docker logout
+      - name: Enviar correo con IP
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "Resultado del despliegue Terraform"
+          body: |
+            Estado del job: ${{ job.status }}
+            IP pública de la VM: ${{ env.public_ip }}
+          to: joelalejsanchez@ejemplo.com
