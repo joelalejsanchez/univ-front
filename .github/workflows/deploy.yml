@@ -16,6 +16,11 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.7.0
+      - name: Guardar clave privada en runner
+        run: |
+          mkdir -p ~/.oci
+          echo "${{ secrets.TF_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
 
       - name: Crear terraform.tfvars
         working-directory: terraform
@@ -24,9 +29,7 @@ jobs:
           tenancy_ocid = "${{ secrets.TF_TENANCY_OCID }}"
           user_ocid = "${{ secrets.TF_USER_OCID }}"
           fingerprint = "${{ secrets.TF_FINGERPRINT }}"
-          private_key = <<EOT
-          ${{ secrets.TF_PRIVATE_KEY }}
-          EOT
+          private_key = "~/.oci/oci_api_key.pem"
           region = "${{ secrets.TF_REGION }}"
           compartment_ocid = "${{ secrets.TF_COMPARTMENT_OCID }}"
           subnet_id = "${{ secrets.TF_SUBNET_ID }}"
