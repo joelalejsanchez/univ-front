@@ -51,7 +51,7 @@ jobs:
       - name: Configurar SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{secrets.TF_PRIVATE_KEY}}
+          ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
 
       - name: Copiar y ejecutar setup_vm.sh
         uses: appleboy/scp-action@v0.1.3
