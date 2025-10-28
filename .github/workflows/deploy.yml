@@ -21,19 +21,19 @@ jobs:
         working-directory: terraform
         run: |
           cat <<EOF > terraform.tfvars
-        tenancy_ocid = "${{ secrets.TF_TENANCY_OCID }}"
-        user_ocid = "${{ secrets.TF_USER_OCID }}"
-        fingerprint = "${{ secrets.TF_FINGERPRINT }}"
-        private_key = <<EOT
-        "${{ secrets.TF_PRIVATE_KEY }}"
-        EOT
-        region = "${{ secrets.TF_REGION }}"
-        compartment_ocid = "${{ secrets.TF_COMPARTMENT_OCID }}"
-        subnet_id = "${{ secrets.TF_SUBNET_ID }}"
-        availability_domain = "${{ secrets.TF_AVAILABILITY_DOMAIN }}"
-        ubuntu_image = "${{ secrets.TF_UBUNTU_IMAGE }}"
-        ssh_public_key = "${{ secrets.TF_SSH_PUBLIC_KEY }}"
-        EOF
+          tenancy_ocid = "${{ secrets.TF_TENANCY_OCID }}"
+          user_ocid = "${{ secrets.TF_USER_OCID }}"
+          fingerprint = "${{ secrets.TF_FINGERPRINT }}"
+          private_key = <<EOT
+          "${{ secrets.TF_PRIVATE_KEY }}"
+          EOT
+          region = "${{ secrets.TF_REGION }}"
+          compartment_ocid = "${{ secrets.TF_COMPARTMENT_OCID }}"
+          subnet_id = "${{ secrets.TF_SUBNET_ID }}"
+          availability_domain = "${{ secrets.TF_AVAILABILITY_DOMAIN }}"
+          ubuntu_image = "${{ secrets.TF_UBUNTU_IMAGE }}"
+          ssh_public_key = "${{ secrets.TF_SSH_PUBLIC_KEY }}"
+          EOF
 
       - name: Terraform Init & Apply
         working-directory: terraform
