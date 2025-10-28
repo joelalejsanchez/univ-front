@@ -101,7 +101,7 @@ jobs:
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
           from: ${{ secrets.EMAIL_USER }}
-          to: joelalejsanchez@ejemplo.com
+          to: joelalejsanchez@gmail.com
           subject: "Resultado del despliegue Terraform"
           body: |
             Estado del job: ${{ job.status }}
