@@ -24,7 +24,9 @@ jobs:
           tenancy_ocid = "${{ secrets.TF_TENANCY_OCID }}"
           user_ocid = "${{ secrets.TF_USER_OCID }}"
           fingerprint = "${{ secrets.TF_FINGERPRINT }}"
-          private_key = "${{ secrets.TF_PRIVATE_KEY }}"
+          private_key = <<EOT
+          "${{ secrets.TF_PRIVATE_KEY }}"
+          EOT
           region = "${{ secrets.TF_REGION }}"
           compartment_ocid = "${{ secrets.TF_COMPARTMENT_OCID }}"
           subnet_id = "${{ secrets.TF_SUBNET_ID }}"
@@ -98,8 +100,9 @@ jobs:
           server_port: 587
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
+          from: ${{ secrets.EMAIL_USER }}
+          to: joelalejsanchez@ejemplo.com
           subject: "Resultado del despliegue Terraform"
           body: |
             Estado del job: ${{ job.status }}
             IP pública de la VM: ${{ env.public_ip }}
-          to: joelalejsanchez@ejemplo.com
