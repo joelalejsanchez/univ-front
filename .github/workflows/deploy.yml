@@ -19,7 +19,7 @@ jobs:
       - name: Guardar clave privada en runner
         run: |
           mkdir -p ~/.oci
-          printf '%s\n' "${{ secrets.TF_PRIVATE_KEY }}" > ~/.oci/oci_api_key.pem
+          echo "${{ secrets.TF_PRIVATE_KEY }}" | tr -d '\r' > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
 
       - name: Crear terraform.tfvars
