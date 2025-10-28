@@ -29,7 +29,7 @@ jobs:
           tenancy_ocid = "${{ secrets.TF_TENANCY_OCID }}"
           user_ocid = "${{ secrets.TF_USER_OCID }}"
           fingerprint = "${{ secrets.TF_FINGERPRINT }}"
-          private_key = "~/.oci/oci_api_key.pem"
+          private_key_path = "~/.oci/oci_api_key.pem"
           region = "${{ secrets.TF_REGION }}"
           compartment_ocid = "${{ secrets.TF_COMPARTMENT_OCID }}"
           subnet_id = "${{ secrets.TF_SUBNET_ID }}"
