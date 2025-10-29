@@ -11,20 +11,55 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      
+      - name: Instalar OCI CLI
+        run: |
+          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
 
+      - name: Configurar OCI CLI
+        run: |
+          mkdir -p ~/.oci
+          cat <<EOF > ~/.oci/config
+          [DEFAULT]
+          user=${{ secrets.TF_USER_OCID }}
+          fingerprint=${{ secrets.TF_FINGERPRINT }}
+          key_file=${{ secrets.TF_PRIVATE_KEY_PATH }}
+          tenancy=${{ secrets.TF_TENANCY_OCID }}
+          region=${{ secrets.TF_REGION }}
+          EOF
+
+      - name: Verificar si la instancia existe
+        id: check_vm
+        run: |
+          INST=$(oci compute instance list \
+            --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
+            --query "data[?\"display-name\"=='mi-vm'].{Name:'display-name',State:'lifecycle-state',IP:'public-ip'}" \
+            --raw-output)
+          if [ -n "$INST" ]; then
+            IP=$(echo $INST | jq -r '.[0].IP')
+            echo "instance_exists=true" >> $GITHUB_OUTPUT
+            echo "public_ip=$IP" >> $GITHUB_OUTPUT
+          else
+            echo "instance_exists=false" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Setup Terraform
+        if: steps.check_vm.outputs.instance_exists == 'false'
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.7.0
           terraform_wrapper: false
           
       - name: Guardar clave privada en runner
+        if: steps.check_vm.outputs.instance_exists == 'false'
         run: |
           mkdir -p ~/.oci
           echo "${{ secrets.TF_PRIVATE_KEY }}" | tr -d '\r' > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
 
       - name: Crear terraform.tfvars
+        if: steps.check_vm.outputs.instance_exists == 'false'
         working-directory: terraform
         run: |
           cat <<EOF > terraform.tfvars
@@ -41,15 +76,27 @@ jobs:
           EOF
 
       - name: Terraform Init & Apply
+        if: steps.check_vm.outputs.instance_exists == 'false'
         id: terraform
         working-directory: terraform
         run: |
           terraform init
           terraform apply -auto-approve
 
+      - name: Definir IP final
+        id: final_ip
+        run: |
+          if [ "${{ steps.check_vm.outputs.instance_exists }}" = "true" ]; then
+            echo "public_ip=${{ steps.check_vm.outputs.public_ip }}" >> $GITHUB_OUTPUT
+          else
+            IP=$(terraform output -raw public_ip)
+            echo "public_ip=$IP" >> $GITHUB_OUTPUT
+          fi
+
       - name: Esperar que el servidor esté listo
+        if: steps.check_vm.outputs.instance_exists == 'false'
         run: sleep 30
-        
+
       - name: Configurar SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -58,7 +105,7 @@ jobs:
       - name: Copiar y ejecutar setup_vm.sh
         uses: appleboy/scp-action@v0.1.3
         with:
-          host: ${{ steps.terraform.outputs.public_ip }}
+          host: ${{ steps.final_ip.outputs.public_ip }}
           username: ${{secrets.SSH_USER}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           source: setup_vm.sh
@@ -67,7 +114,7 @@ jobs:
       - name: Ejecutar setup_vm.sh
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ steps.terraform.outputs.public_ip }}
+          host: ${{ steps.final_ip.outputs.public_ip }}
           username: ${{secrets.SSH_USER}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           script: |
@@ -78,7 +125,7 @@ jobs:
       - name: Copiar docker-compose.yml
         uses: appleboy/scp-action@v0.1.3
         with:
-          host: ${{ steps.terraform.outputs.public_ip }}
+          host: ${{ steps.final_ip.outputs.public_ip }}
           username: ${{secrets.SSH_USER}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           source: docker-compose.yml
@@ -87,7 +134,7 @@ jobs:
       - name: Ejecutar Docker Compose
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ steps.terraform.outputs.public_ip }}
+          host: ${{ steps.final_ip.outputs.public_ip }}
           username: ${{secrets.SSH_USER}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           script: |
