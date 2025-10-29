@@ -8,7 +8,8 @@ USER_TO_ADD="$1" # Recibe el nombre de usuario de SSH
 echo "--- 1. Actualizando e instalando Docker y Docker Compose ---"
 # Usamos 'sudo' para tener permisos de instalación
 sudo apt update -y
-sudo apt install -y docker.io docker-compose
+sudo apt install -y docker.io 
+sudo apt install -y docker-compose-plugin
 
 echo "--- 2. Configurando permisos de Docker ---"
 # Agrega el usuario al grupo docker para permitir ejecutar comandos sin sudo (aunque en el pipeline usamos sudo por seguridad)
