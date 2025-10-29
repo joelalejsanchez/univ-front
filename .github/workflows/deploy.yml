@@ -54,7 +54,7 @@ jobs:
 
           if [ -n "$INSTANCE_ID" ] && [ "$INSTANCE_ID" != "null" ]; then
             PUBLIC_IP=$(oci compute vnic list --instance-id $INSTANCE_ID \
-              --query 'data[0]."public-ip"' --raw-output)
+              --query "data[0].\"public-ip\"" --raw-output)
             echo "instance_exists=true" >> $GITHUB_OUTPUT
             echo "public_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
           else
