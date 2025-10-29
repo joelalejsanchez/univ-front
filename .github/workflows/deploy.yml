@@ -12,6 +12,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       
+      - name: Guardar clave privada en runner
+        run: |
+          mkdir -p ~/.oci
+          echo "${{ secrets.TF_PRIVATE_KEY }}" | tr -d '\r' > ~/.oci/oci_api_key.pem
+          chmod 600 ~/.oci/oci_api_key.pem
+
       - name: Instalar OCI CLI
         run: |
           bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" -- --accept-all-defaults
@@ -24,7 +30,7 @@ jobs:
           [DEFAULT]
           user=${{ secrets.TF_USER_OCID }}
           fingerprint=${{ secrets.TF_FINGERPRINT }}
-          key_file=${{ secrets.TF_PRIVATE_KEY_PATH }}
+          key_file=/home/runner/.oci/oci_api_key.pem
           tenancy=${{ secrets.TF_TENANCY_OCID }}
           region=${{ secrets.TF_REGION }}
           EOF
@@ -51,12 +57,6 @@ jobs:
           terraform_version: 1.7.0
           terraform_wrapper: false
           
-      - name: Guardar clave privada en runner
-        if: steps.check_vm.outputs.instance_exists == 'false'
-        run: |
-          mkdir -p ~/.oci
-          echo "${{ secrets.TF_PRIVATE_KEY }}" | tr -d '\r' > ~/.oci/oci_api_key.pem
-          chmod 600 ~/.oci/oci_api_key.pem
 
       - name: Crear terraform.tfvars
         if: steps.check_vm.outputs.instance_exists == 'false'
