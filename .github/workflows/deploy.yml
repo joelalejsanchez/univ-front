@@ -25,7 +25,6 @@ jobs:
 
       - name: Configurar OCI CLI
         run: |
-          mkdir -p ~/.oci
           cat <<EOF > ~/.oci/config
           [DEFAULT]
           user=${{ secrets.TF_USER_OCID }}
@@ -42,7 +41,7 @@ jobs:
             --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
             --query "data[].{Name:'display-name',State:'lifecycle-state',IP:'public-ip'}" \
             --raw-output
-            
+
       - name: Verificar si la instancia existe
         id: check_vm
         run: |
