@@ -155,9 +155,9 @@ jobs:
           script: |
             cd /home/${{secrets.SSH_USER}}/deploy
             echo ${{secrets.DOCKER_TOKEN}} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d --force-recreate
+            sudo /usr/bin/docker-compose down
+            sudo /usr/bin/docker-compose pull
+            sudo /usr/bin/docker-compose up -d --force-recreate
             docker logout
       - name: Enviar correo con IP
         if: always()
