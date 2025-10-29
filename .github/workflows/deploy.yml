@@ -18,13 +18,6 @@ jobs:
           echo "${{ secrets.TF_PRIVATE_KEY }}" | tr -d '\r' > ~/.oci/oci_api_key.pem
           chmod 600 ~/.oci/oci_api_key.pem
 
-      - name: Instalar OCI CLI
-        run: |
-          bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" -- --accept-all-defaults
-          echo "$HOME/bin" >> $GITHUB_PATH
-
-      - name: Configurar OCI CLI
-        run: |
           cat <<EOF > ~/.oci/config
           [DEFAULT]
           user=${{ secrets.TF_USER_OCID }}
@@ -33,6 +26,15 @@ jobs:
           tenancy=${{ secrets.TF_TENANCY_OCID }}
           region=${{ secrets.TF_REGION }}
           EOF
+          chmod 600 ~/.oci/config
+
+          export SUPPRESS_LABEL_WARNING=True
+          export OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING=True
+
+      - name: Instalar OCI CLI
+        run: |
+          bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" -- --accept-all-defaults
+          echo "$HOME/bin" >> $GITHUB_PATH
 
       - name: Listar todas las instancias
         run: |
