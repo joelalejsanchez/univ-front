@@ -47,15 +47,16 @@ jobs:
       - name: Verificar si la instancia existe
         id: check_vm
         run: |
-          INST=$(oci compute instance list \
-          --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
-          --query "data[?\"display-name\"=='ubuntu-docker-vm' && \"lifecycle-state\"=='RUNNING'].{Name:'display-name',State:'lifecycle-state',IP:'public-ip'}" \
-          --raw-output)
-          
-          if [ "$INST" != "[]" ] && [ -n "$INST" ]; then
-            IP=$(echo $INST | jq -r '.[0].IP')
+          INSTANCE_ID=$(oci compute instance list \
+            --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
+            --query 'data[? "display-name"==`ubuntu-docker-vm` && "lifecycle-state"==`RUNNING`].id | [0]' \
+            --raw-output)
+
+          if [ -n "$INSTANCE_ID" ] && [ "$INSTANCE_ID" != "null" ]; then
+            PUBLIC_IP=$(oci compute vnic list --instance-id $INSTANCE_ID \
+              --query 'data[0]."public-ip"' --raw-output)
             echo "instance_exists=true" >> $GITHUB_OUTPUT
-            echo "public_ip=$IP" >> $GITHUB_OUTPUT
+            echo "public_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
           else
             echo "instance_exists=false" >> $GITHUB_OUTPUT
           fi
@@ -92,7 +93,7 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
-          
+
       - name: Esperar que el servidor esté listo
         if: steps.check_vm.outputs.instance_exists == 'false'
         run: sleep 30
@@ -112,6 +113,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
+
+      - name: Debug IP
+        run: echo "IP final: ${{ steps.final_ip.outputs.public_ip }}"
 
       - name: Copiar y ejecutar setup_vm.sh
         uses: appleboy/scp-action@v0.1.3
