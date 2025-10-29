@@ -16,6 +16,8 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.7.0
+          terraform_wrapper: false
+          
       - name: Guardar clave privada en runner
         run: |
           mkdir -p ~/.oci
@@ -44,7 +46,6 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
-          echo "public_ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
 
       - name: Configurar SSH
         uses: webfactory/ssh-agent@v0.9.0
