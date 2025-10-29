@@ -19,8 +19,9 @@ echo "--- 3. Configurando Firewall Interno (UFW en Puerto 80) ---"
 sudo apt install -y ufw
 # Abre el puerto 80 (HTTP)
 sudo ufw allow 80/tcp
+sudo ufw allow 3000/tcp
 # Habilita el firewall (si no está activo)
-sudo ufw enable -y 
+sudo ufw --force enable
 sudo ufw status verbose
 
 echo "--- 4. Asegurando Directorio de Despliegue ---"
