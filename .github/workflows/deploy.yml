@@ -41,7 +41,7 @@ jobs:
           echo "Instancias en el compartment:"
           oci compute instance list \
             --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
-            --query "data[].{Name:'display-name',State:'lifecycle-state',IP:'public-ip'}" \
+            --query 'data[].{Name:"display-name",State:"lifecycle-state",IP:"public-ip"}' \
             --raw-output
 
       - name: Verificar si la instancia existe
@@ -49,10 +49,10 @@ jobs:
         run: |
           INST=$(oci compute instance list \
             --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
-            --query "data[?\"display-name\"=='ubuntu-docker-vm' && \"lifecycle-state\"=='RUNNING'].{Name:'display-name',State:'lifecycle-state',IP:'public-ip'}" \
+            --query 'data[?@"display-name"==`ubuntu-docker-vm` && @"lifecycle-state"==`RUNNING`].{"Name":"display-name","State":"lifecycle-state","IP":"public-ip"}' \
             --raw-output)
           
-          if [ -n "$INST" ]; then
+          if [ "$INST" != "[]" ] && [ -n "$INST" ]; then
             IP=$(echo $INST | jq -r '.[0].IP')
             echo "instance_exists=true" >> $GITHUB_OUTPUT
             echo "public_ip=$IP" >> $GITHUB_OUTPUT
