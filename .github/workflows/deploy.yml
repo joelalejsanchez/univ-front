@@ -36,28 +36,27 @@ jobs:
           bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" -- --accept-all-defaults
           echo "$HOME/bin" >> $GITHUB_PATH
 
-      - name: Listar todas las instancias
-        run: |
-          echo "Instancias en el compartment:"
-          oci compute instance list \
-            --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
-            --query 'data[].{Name:"display-name",State:"lifecycle-state",IP:"public-ip"}' \
-            --raw-output
-
-      - name: Verificar si la instancia existe
-        id: check_vm
+      - name: Obtener IP de instancia activa
+        id: get_vm_ip
         run: |
           INSTANCE_ID=$(oci compute instance list \
-              --compartment-id *** \
-              --query "data[?\"display-name\"=='***-docker-vm' && \"lifecycle-state\"=='RUNNING'].id | [0]" \
-              --raw-output || echo "")
+            --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
+            --query "data[?\"display-name\"=='ubuntu-docker-vm' && \"lifecycle-state\"=='RUNNING'].id | [0]" \
+            --raw-output || echo "")
 
           if [ -n "$INSTANCE_ID" ] && [ "$INSTANCE_ID" != "null" ]; then
-              VNIC_ID=$(oci compute vnic-attachment list --compartment-id *** --instance-id $INSTANCE_ID \
-                  --query "data[0].\"vnic-id\"" --raw-output || echo "")
+              # Obtener el VNIC principal de la instancia
+              VNIC_ID=$(oci compute vnic-attachment list \
+                --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
+                --instance-id $INSTANCE_ID \
+                --query "data[0].\"vnic-id\"" \
+                --raw-output || echo "")
 
-              PUBLIC_IP=$(oci network vnic get --vnic-id $VNIC_ID \
-                  --query "data.\"public-ip\"" --raw-output || echo "")
+              # Obtener la IP pública del VNIC
+              PUBLIC_IP=$(oci network vnic get \
+                --vnic-id $VNIC_ID \
+                --query "data.\"public-ip\"" \
+                --raw-output || echo "")
 
               echo "instance_exists=true" >> $GITHUB_OUTPUT
               echo "public_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
