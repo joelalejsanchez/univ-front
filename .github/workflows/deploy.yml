@@ -44,31 +44,23 @@ jobs:
             --query 'data[].{Name:"display-name",State:"lifecycle-state",IP:"public-ip"}' \
             --raw-output
 
-      - name: Verificar si la instancia existe
+     - name: Verificar si la instancia existe
         id: check_vm
         run: |
-          echo "Buscando instancia..."
-          oci compute instance list \
-            --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
-            --query "data[?\"display-name\"=='ubuntu-docker-vm']" \
-            --raw-output
-
           INSTANCE_ID=$(oci compute instance list \
             --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
             --query "data[?\"display-name\"=='ubuntu-docker-vm' && \"lifecycle-state\"=='RUNNING'].id | [0]" \
             --raw-output || echo "")
 
-          echo "INSTANCE_ID='$INSTANCE_ID'"
-
           if [ -n "$INSTANCE_ID" ] && [ "$INSTANCE_ID" != "null" ]; then
             PUBLIC_IP=$(oci compute vnic list --instance-id $INSTANCE_ID \
-              --query "data[0].\"public-ip\"" --raw-output || echo "")
+              --query "data[?\"public-ip\"!=null].\"public-ip\" | [0]" --raw-output || echo "")
             echo "instance_exists=true" >> $GITHUB_OUTPUT
             echo "public_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
           else
             echo "instance_exists=false" >> $GITHUB_OUTPUT
           fi
-      
+          
       - name: Setup Terraform
         if: steps.check_vm.outputs.instance_exists == 'false'
         uses: hashicorp/setup-terraform@v2
