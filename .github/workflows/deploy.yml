@@ -105,13 +105,12 @@ jobs:
       - name: Definir IP final
         id: final_ip
         run: |
-          if [ "${{ steps.check_vm.outputs.instance_exists }}" = "true" ]; then
-            echo "public_ip=${{ steps.check_vm.outputs.public_ip }}" >> $GITHUB_OUTPUT
+          if [ "${{ steps.get_vm_ip.outputs.instance_exists }}" = "true" ]; then
+            echo "public_ip=${{ steps.get_vm_ip.outputs.public_ip }}" >> $GITHUB_OUTPUT
           else
             IP=$(terraform output -raw public_ip)
             echo "public_ip=$IP" >> $GITHUB_OUTPUT
           fi
-
 
       - name: Configurar SSH
         uses: webfactory/ssh-agent@v0.9.0
