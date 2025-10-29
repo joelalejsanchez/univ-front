@@ -58,6 +58,7 @@ jobs:
                 --query "data.\"public-ip\"" \
                 --raw-output || echo "")
 
+              echo "IP pública encontrada: $PUBLIC_IP"
               echo "instance_exists=true" >> $GITHUB_OUTPUT
               echo "public_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
           else
