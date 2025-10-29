@@ -48,9 +48,9 @@ jobs:
         id: check_vm
         run: |
           INST=$(oci compute instance list \
-            --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
-            --query 'data[?@"display-name"==`ubuntu-docker-vm` && @"lifecycle-state"==`RUNNING`].{"Name":"display-name","State":"lifecycle-state","IP":"public-ip"}' \
-            --raw-output)
+          --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
+          --query "data[?\"display-name\"=='ubuntu-docker-vm' && \"lifecycle-state\"=='RUNNING'].{Name:'display-name',State:'lifecycle-state',IP:'public-ip'}" \
+          --raw-output)
           
           if [ "$INST" != "[]" ] && [ -n "$INST" ]; then
             IP=$(echo $INST | jq -r '.[0].IP')
