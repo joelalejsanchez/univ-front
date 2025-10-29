@@ -47,14 +47,22 @@ jobs:
       - name: Verificar si la instancia existe
         id: check_vm
         run: |
+          echo "Buscando instancia..."
+          oci compute instance list \
+            --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
+            --query "data[?\"display-name\"=='ubuntu-docker-vm']" \
+            --raw-output
+
           INSTANCE_ID=$(oci compute instance list \
             --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
             --query "data[?\"display-name\"=='ubuntu-docker-vm' && \"lifecycle-state\"=='RUNNING'].id | [0]" \
-            --raw-output)
+            --raw-output || echo "")
+
+          echo "INSTANCE_ID='$INSTANCE_ID'"
 
           if [ -n "$INSTANCE_ID" ] && [ "$INSTANCE_ID" != "null" ]; then
             PUBLIC_IP=$(oci compute vnic list --instance-id $INSTANCE_ID \
-              --query "data[0].\"public-ip\"" --raw-output)
+              --query "data[0].\"public-ip\"" --raw-output || echo "")
             echo "instance_exists=true" >> $GITHUB_OUTPUT
             echo "public_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
           else
