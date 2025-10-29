@@ -14,7 +14,7 @@ jobs:
       
       - name: Instalar OCI CLI
         run: |
-          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash
+          bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" -- --accept-all-defaults
           echo "$HOME/bin" >> $GITHUB_PATH
 
       - name: Configurar OCI CLI
@@ -157,4 +157,4 @@ jobs:
           subject: "Resultado del despliegue Terraform"
           body: |
             Estado del job: ${{ job.status }}
-            IP pública de la VM: ${{ steps.terraform.outputs.public_ip }}
+            IP pública de la VM:  ${{ steps.final_ip.outputs.public_ip }}
