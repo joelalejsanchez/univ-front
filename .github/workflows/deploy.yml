@@ -49,7 +49,7 @@ jobs:
         run: |
           INSTANCE_ID=$(oci compute instance list \
             --compartment-id ${{ secrets.TF_COMPARTMENT_OCID }} \
-            --query 'data[? "display-name"==`ubuntu-docker-vm` && "lifecycle-state"==`RUNNING`].id | [0]' \
+            --query 'data[?@"display-name"==`***-docker-vm` && @"lifecycle-state"==`RUNNING`].id | [0]' \
             --raw-output)
 
           if [ -n "$INSTANCE_ID" ] && [ "$INSTANCE_ID" != "null" ]; then
